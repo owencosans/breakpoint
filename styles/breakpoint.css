@@ -39,6 +39,73 @@ section[data-testid="stSidebar"] {
 }
 section[data-testid="stSidebar"] .stMarkdown { color: var(--bp-mist); }
 
+/* ---- sidebar navigation (st.navigation) --------------------------------
+   Streamlit's default renders these links near-invisible on our dark ground.
+   Target by data-testid / element, never generated class names. Inactive =
+   readable mist @ 80%; active = amber, weight 600; hover brightens to full. */
+[data-testid="stSidebarNav"] ul { padding-left: 0; }
+
+[data-testid="stSidebarNav"] a,
+[data-testid="stSidebarNav"] a span,
+[data-testid="stSidebarNav"] a p {
+  color: rgba(230, 231, 232, 0.80) !important;   /* --bp-mist @ 80% */
+  font-weight: 500;
+  font-size: 0.92rem;
+  opacity: 1 !important;
+}
+
+/* Streamlit paints its own border-left on every nav link, which made all six
+   read as selected. Zeroing it is the one box-model change that reliably wins
+   here; the active state is carried by type colour and weight instead, which
+   is what actually survives this build's cascade. Do not add background or
+   box-shadow rules here — they are silently overridden. */
+section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"],
+[data-testid="stSidebarNav"] a {
+  display: flex; align-items: center;
+  border-left: 0 !important;
+  border-radius: 0 6px 6px 0;
+  padding: 6px 10px; margin: 1px 0;
+  transition: color 120ms ease;
+}
+
+/* hover: inactive links brighten from 80% to full mist */
+[data-testid="stSidebarNav"] a:hover span,
+[data-testid="stSidebarNav"] a:hover p,
+[data-testid="stSidebarNav"] a:focus-visible span,
+[data-testid="stSidebarNav"] a:focus-visible p {
+  color: var(--bp-mist) !important;
+}
+
+/* active page — amber, and a weight step so it reads at a glance */
+[data-testid="stSidebarNav"] a[aria-current="page"] span,
+[data-testid="stSidebarNav"] a[aria-current="page"] p,
+[data-testid="stSidebarNav"] li[aria-current="page"] > a span,
+[data-testid="stSidebarNav"] li[aria-current="page"] > a p,
+[data-testid="stSidebarNav"] a[class*="active"] span,
+[data-testid="stSidebarNav"] a[class*="active"] p {
+  color: var(--bp-amber) !important;
+  font-weight: 600;
+}
+
+/* ---- sidebar control labels -------------------------------------------
+   Widget labels shipped dim enough to be unreadable in the deploy. */
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] label p,
+section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
+  color: var(--bp-mist) !important;
+  opacity: 1 !important;
+  font-size: 0.86rem; font-weight: 500;
+}
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"],
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {
+  color: var(--bp-muted) !important;
+}
+/* slider min/max ticks and the value bubble */
+section[data-testid="stSidebar"] [data-testid="stSliderTickBarMin"],
+section[data-testid="stSidebar"] [data-testid="stSliderTickBarMax"] {
+  color: var(--bp-muted) !important;
+}
+
 /* ---- metric / summary cards -------------------------------------------- */
 .bp-card {
   background: var(--bp-slate); border: 1px solid var(--bp-gunmetal);
@@ -61,6 +128,55 @@ section[data-testid="stSidebar"] .stMarkdown { color: var(--bp-mist); }
 .bp-hero-value {
   font-family: "IBM Plex Mono", monospace; font-size: 2.9rem; color: var(--bp-mist);
   line-height: 1; font-variant-numeric: tabular-nums;
+}
+
+/* ---- three-beat story strip (Decision page) ----------------------------- */
+.bp-story {
+  display: flex; gap: 10px; margin: 4px 0 10px 0; flex-wrap: wrap;
+  align-items: stretch;
+}
+/* A 170px basis keeps all three beats on one row down to a ~530px content
+   column (a narrow laptop with the rail open). Below that they go to a full
+   single-column stack — never the 2 + 1 orphan the wider basis produced. */
+.bp-story-cell {
+  flex: 1 1 170px; min-width: 0; background: var(--bp-steel);
+  border: 1px solid var(--bp-gunmetal); border-top: 2px solid var(--bp-gunmetal);
+  border-radius: 8px; padding: 12px 14px;
+}
+@media (max-width: 640px) {
+  .bp-story-cell { flex-basis: 100%; }
+}
+.bp-story-cell.is-tension { border-top-color: var(--bp-red); }
+.bp-story-cell.is-caution { border-top-color: var(--bp-muted); }
+.bp-story-cell.is-answer  { border-top-color: var(--bp-amber); background: var(--bp-slate); }
+.bp-story-step {
+  font-family: "IBM Plex Mono", monospace; font-size: 0.68rem;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--bp-muted);
+}
+.bp-story-head {
+  font-family: "IBM Plex Serif", Georgia, serif; font-size: 1.0rem;
+  font-weight: 600; color: var(--bp-mist); margin: 3px 0 4px 0; line-height: 1.25;
+}
+.bp-story-cell.is-answer .bp-story-head { color: var(--bp-amber); }
+.bp-story-body { color: var(--bp-muted); font-size: 0.82rem; line-height: 1.4; }
+
+/* the four jobs, as lines inside the expander */
+.bp-job { display: flex; gap: 10px; padding: 6px 0;
+  border-bottom: 1px solid rgba(52, 65, 76, 0.5); }
+.bp-job:last-child { border-bottom: none; }
+.bp-job-n { font-family: "IBM Plex Mono", monospace; color: var(--bp-amber);
+  font-size: 0.8rem; min-width: 1.2rem; }
+.bp-job-t { color: var(--bp-mist); font-size: 0.86rem; }
+.bp-job-t b { color: var(--bp-mist); }
+.bp-job.is-cuttable .bp-job-n { color: var(--bp-green); }
+
+/* expander readability on the dark ground */
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary p {
+  color: var(--bp-mist) !important; font-weight: 500;
+}
+[data-testid="stExpander"] details {
+  background: var(--bp-steel); border: 1px solid var(--bp-gunmetal); border-radius: 8px;
 }
 
 /* ---- status badges ------------------------------------------------------ */

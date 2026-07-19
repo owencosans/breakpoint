@@ -36,6 +36,22 @@ RETAILER_LABEL = {
     "INDIES": "Independents",
 }
 
+# Bare names, for copy that reads as a sentence rather than a table cell.
+RETAILER_SHORT = {
+    "HARTLINE": "Hartline",
+    "NOVA": "Nova",
+    "INDIES": "the Independents",
+}
+
+# Why each one is exposed — the mechanism, not the ranking (Cascade view).
+RETAILER_MECHANISM = {
+    "HARTLINE": "roughly three-quarters of its book is contract-plan commission — its "
+                "shelf is hostage to the melting format",
+    "NOVA": "mostly digital activations, so every rival offer lands where the volume "
+            "actually flows and gets a meeting",
+    "INDIES": "price-led and the lowest switching costs on the board — first to flip",
+}
+
 
 # ----------------------------------------------------------------------------
 # Core cached run + derived decision quantities
@@ -168,6 +184,18 @@ def retailer_board(scenario: str, divest: float, war_chest: float, alpha: float,
     # closest to walkaway first
     rows.sort(key=lambda r: (not r["defected"], r["distance"]))
     return rows
+
+
+@st.cache_data(show_spinner=False)
+def spend_jobs(scenario: str, war_chest: float, alpha: float, months: int):
+    """The four jobs the channel investment is doing (analysis.four_jobs).
+
+    Read-only use of the model layer. Demo-grade decomposition — every surface
+    that renders this must keep the word "illustrative" in the caption.
+    """
+    wc = None if war_chest < 0 else war_chest
+    p = eng.Params(months=months, granite_target_alpha=alpha)
+    return an.four_jobs(p, wc, alpha, months=months, seed=None)
 
 
 @st.cache_data(show_spinner=True)

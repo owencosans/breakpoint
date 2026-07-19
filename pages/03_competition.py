@@ -21,7 +21,9 @@ P = control_rail()
 ui.brand_header()
 
 ui.eyebrow("Competition")
-st.markdown("#### When a rival's money tips a retailer — and how close you are to it")
+st.markdown("#### NORD's money doesn't fight for customers first — it bids for the shelf")
+st.caption("Entry Pressure is the funding level where rival offers flip at least two dealers. "
+           "Below it the network holds; above it, defections cascade.")
 
 res = st.select_slider("Resolution", options=[8, 12, 16], value=12,
                        help="Higher = smoother phase field, slower first compute (cached after).")
@@ -45,5 +47,6 @@ with c2:
         "defection move forward. A rival's money doesn't just fight for customers — it enters "
         "every retailer's leave-vs-stay math at once.")
 
-st.caption("Green = stable. Amber = contested. Red = a rival dollar level where defections cascade. "
-           "The white marker is where your current settings sit.")
+st.caption("Green = stable. Amber = contested. Red = the rival funding level where defections "
+           "cascade. The white × is where you are. The distance from it to the red region is how "
+           "much rival money the system can absorb before the shelf starts changing hands.")

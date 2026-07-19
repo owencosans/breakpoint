@@ -21,6 +21,8 @@ ui.brand_header()
 
 ui.eyebrow("Assumptions")
 st.markdown("#### What the model believes, grouped by business meaning")
+st.caption("Every number in this app is downstream of these beliefs. Challenge them here, "
+           "not in the outputs.")
 st.caption("These are the inputs behind every number in Breakpoint. Each is a stylized figure "
            "calibrated from public benchmarks, not client data. Adjust in code (model/engine.py) "
            "to test alternatives; shown here read-only for transparency in the room.")

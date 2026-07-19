@@ -23,31 +23,40 @@ def decision_band(cut_info, proposed_pct):
     prop = proposed_pct * 100
 
     fig = go.Figure()
-    # zones (stronger fills + labels)
+    # Zone labels ride along the BOTTOM of the plot; the Cutline/Breakpoint
+    # annotations own the top. Separating them vertically is what keeps the two
+    # label families from colliding when headroom is narrow.
+    zone_font = dict(size=10, family="IBM Plex Mono")
     fig.add_vrect(x0=0, x1=cutline, fillcolor="rgba(50,166,160,0.16)", line_width=0,
-                  annotation_text="SAFE", annotation_position="top left",
-                  annotation_font=dict(color=th.TEAL, size=10, family="IBM Plex Mono"))
+                  annotation_text="SAFE", annotation_position="bottom left",
+                  annotation_font=dict(color=th.TEAL, **zone_font))
     fig.add_vrect(x0=cutline, x1=bpt, fillcolor="rgba(233,162,59,0.16)", line_width=0,
-                  annotation_text="PRESSURE", annotation_position="top",
-                  annotation_font=dict(color=th.AMBER, size=10, family="IBM Plex Mono"))
+                  annotation_text="PRESSURE", annotation_position="bottom",
+                  annotation_font=dict(color=th.AMBER, **zone_font))
     fig.add_vrect(x0=bpt, x1=grid[-1], fillcolor="rgba(217,75,75,0.18)", line_width=0,
-                  annotation_text="BREACH", annotation_position="top right",
-                  annotation_font=dict(color=th.RED, size=10, family="IBM Plex Mono"))
+                  annotation_text="BREACH", annotation_position="bottom right",
+                  annotation_font=dict(color=th.RED, **zone_font))
     # cash curve
     fig.add_trace(go.Scatter(x=grid, y=npv, line=dict(color=th.MIST, width=3), name="Cash outcome"))
-    # cutline + breakpoint
+    # Cutline leans left, Breakpoint leans right, so they stay legible even when
+    # the headroom between them is only a grid step or two.
     fig.add_vline(x=cutline, line=dict(color=th.TEAL, width=2),
-                  annotation_text="Cutline", annotation_position="top",
-                  annotation_font_color=th.TEAL)
+                  annotation_text="Cutline", annotation_position="top left",
+                  annotation_font=dict(color=th.TEAL, size=12))
     fig.add_vline(x=bpt, line=dict(color=th.RED, width=2, dash="dash"),
-                  annotation_text="Breakpoint", annotation_position="top",
-                  annotation_font_color=th.RED)
-    # proposed marker
-    fig.add_trace(go.Scatter(x=[prop], y=[np.interp(prop, grid, npv)], mode="markers",
+                  annotation_text="Breakpoint", annotation_position="top right",
+                  annotation_font=dict(color=th.RED, size=12))
+    # Proposed marker, labelled in place. Direct labelling beats a legend here:
+    # the top-right legend used to sit on top of the "Breakpoint" annotation.
+    fig.add_trace(go.Scatter(x=[prop], y=[np.interp(prop, grid, npv)], mode="markers+text",
                              marker=dict(color=th.AMBER, size=15, symbol="diamond"),
-                             name="Proposed cut"))
-    return th.style(fig, 360, "Cash outcome across the cut — the line holds, then it doesn't",
-                    ytitle="Cash outcome (index $MM)", xtitle="Investment reduction (%)")
+                             text=["Proposed cut"], textposition="bottom center",
+                             textfont=dict(color=th.AMBER, size=11, family="IBM Plex Mono"),
+                             name="Proposed cut", showlegend=False, cliponaxis=False))
+    fig = th.style(fig, 400, "Cash outcome across the cut — the line holds, then it doesn't",
+                   ytitle="Cash outcome (index $MM)", xtitle="Investment reduction (%)")
+    fig.update_layout(showlegend=False, margin=dict(l=64, r=28, t=52, b=52))
+    return fig
 
 
 def stay_vs_leave(pnl_row_stay, pnl_row_defect, switch_cost, label):
@@ -101,7 +110,19 @@ def phase_diagram(ph, b_star, cur_wc, cur_defense):
 
 
 def four_jobs_bar(components):
-    fig = go.Figure(go.Bar(x=list(components.keys()), y=list(components.values()),
-                           marker_color=[th.TEAL, th.GREEN, th.AMBER, "#6E8CA0"]))
-    return th.style(fig, 300, "What the investment actually buys",
-                    ytitle="Value contribution (index $MM)")
+    """The four jobs the spend is doing. The last bar — competitive offset — is
+    the standoff tax: the only part that is safely cuttable, so it carries the
+    signal colour while the three load-bearing jobs stay recessive."""
+    labels = list(components.keys())
+    values = list(components.values())
+    colors = [th.TEAL, th.GREEN, "#6E8CA0"] + [th.AMBER] * max(len(labels) - 3, 0)
+    fig = go.Figure(go.Bar(
+        x=labels, y=values, marker_color=colors[:len(labels)],
+        text=[f"{v:,.0f}" for v in values], textposition="outside",
+        textfont=dict(family="IBM Plex Mono", size=11, color=th.MIST),
+        cliponaxis=False))
+    fig = th.style(fig, 320, "What the investment actually buys",
+                   ytitle="Value contribution (index $MM)")
+    fig.update_xaxes(tickfont=dict(family="Inter", size=11, color=th.MIST))
+    fig.update_layout(margin=dict(l=64, r=28, t=52, b=56))
+    return fig

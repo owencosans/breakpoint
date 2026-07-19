@@ -86,6 +86,29 @@ def hero_card(label, value, sub=None, color=None):
         unsafe_allow_html=True)
 
 
+def story_strip(cells):
+    """The three-beat story strip: ROI says cut / history says careful / the
+    model's answer. `cells` is [(step, headline, body, variant)] where variant
+    is one of tension | caution | answer."""
+    inner = "".join(
+        f'<div class="bp-story-cell is-{variant}">'
+        f'<div class="bp-story-step">{step}</div>'
+        f'<div class="bp-story-head">{head}</div>'
+        f'<div class="bp-story-body">{body}</div></div>'
+        for step, head, body, variant in cells)
+    st.markdown(f'<div class="bp-story">{inner}</div>', unsafe_allow_html=True)
+
+
+def job_lines(jobs):
+    """The four jobs the spend does. `jobs` is [(title, body, is_cuttable)]."""
+    inner = "".join(
+        f'<div class="bp-job{" is-cuttable" if cuttable else ""}">'
+        f'<div class="bp-job-n">{i}</div>'
+        f'<div class="bp-job-t"><b>{title}</b> — {body}</div></div>'
+        for i, (title, body, cuttable) in enumerate(jobs, 1))
+    st.markdown(f'<div>{inner}</div>', unsafe_allow_html=True)
+
+
 def badge(state: str):
     cls, lbl = STATES.get(state, ("bp-held", state))
     return f'<span class="bp-badge {cls}">{lbl}</span>'

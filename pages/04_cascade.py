@@ -20,7 +20,10 @@ P = control_rail()
 ui.brand_header()
 
 ui.eyebrow("Cascade")
-st.markdown("#### One retailer leaving changes the economics of the next")
+st.markdown("#### Why the second defection is cheaper than the first")
+st.caption("When one dealer leaves, its shelf starts promoting rivals, the growth format gets "
+           "more visible, decline steepens — and the next dealer's leave-versus-stay math "
+           "improves without anyone spending another dollar.")
 
 board = dec.retailer_board(P["scenario"], P["divest"], P["war_chest"], P["alpha"], P["months"])
 R = dec.run_scenario(P["scenario"], P["divest"], P["war_chest"], P["alpha"], P["months"])
@@ -35,6 +38,8 @@ for i, r in enumerate(board, 1):
     st.markdown(
         f'<div class="bp-card" style="border-left:3px solid {col}">'
         f'<b>{i}. {r["label"]}</b> &nbsp; {ui.badge(r["state"])}<br>'
+        f'<span class="bp-card-sub">Why it is exposed: '
+        f'{dec.RETAILER_MECHANISM[r["retailer"]]}.</span><br>'
         f'<span class="bp-card-sub">Buffer {r["distance"]:+.2f}× switching cost · '
         f'a rival offer near {r["rival_offer_required"]:.1f} would tip it</span></div>',
         unsafe_allow_html=True)
@@ -49,9 +54,11 @@ else:
     st.markdown(
         f'<div class="bp-card" style="border-left:3px solid {ui.C["teal"]}">'
         f'No defection on the current settings. The chain is intact — but note the ordering: '
-        f'{board[0]["retailer"]} is the first domino, and it is the one to watch.</div>',
+        f'{dec.RETAILER_SHORT[board[0]["retailer"]]} is the first domino, and it is the one '
+        f'to watch.</div>',
         unsafe_allow_html=True)
 
-st.caption("Ordering is by how close each retailer sits to its walkaway point. The first to flip "
-           "is not always the biggest — it's the one whose floor space is most hostage to the "
-           "declining format.")
+st.caption("Ordering is by how close each dealer sits to its walkaway point. The first to flip "
+           "is not the biggest — it's the one whose floor space is most hostage to the declining "
+           "format. And because each departure improves the next dealer's math, the cost of "
+           "holding the line rises after the first one goes.")

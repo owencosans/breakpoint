@@ -21,9 +21,18 @@ P = control_rail()
 ui.brand_header()
 
 ui.eyebrow("Retailers")
-st.markdown("#### When each retailer is economically better off leaving")
+st.markdown("#### Sit on Hartline's side of the desk")
+st.caption("Every dealer runs the same monthly math: what staying pays versus what leaving pays. "
+           "Our check only has to beat the difference.")
 
 board = dec.retailer_board(P["scenario"], P["divest"], P["war_chest"], P["alpha"], P["months"])
+
+st.markdown(
+    f'<div class="bp-card" style="border-left:3px solid {ui.C["amber"]}">'
+    'The contract caps the dealer\'s margin on our plans <b>and</b> caps how much rival money '
+    'the store is allowed to take. The payment compensates for both — which is why its ROI '
+    'was never the point.</div>',
+    unsafe_allow_html=True)
 
 # ---- walkaway table ----
 def fmt_state(s):
@@ -77,7 +86,8 @@ with c2:
     ui.card("When leaving pencils", f"mo {ets}" if ets is not None else "not on this policy",
             "first month the math flips", ui.C["red"] if ets is not None else ui.C["teal"])
 
-st.caption("The contract caps the retailer's margin on our brands and caps how much rival money "
-           "the store can harvest — our payment compensates for both. Leaving unlocks open margins, "
-           "every rival's money, and the option to re-slot shelf space to the growth format, minus "
-           "the cost of switching.")
+st.caption("Read the two stacks against each other. Leaving unlocks open margins, every rival's "
+           "checks, and the option to re-slot shelf space to the growth format — minus the cost "
+           "of switching. When the growth format out-earns the legacy shelf, that math flips on "
+           "its own. That drift is what the payment is fighting, and it is why cutting the "
+           "payment and cutting the risk are not the same move.")

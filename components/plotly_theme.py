@@ -34,9 +34,9 @@ def style(fig, height=360, title=None, ytitle=None, xtitle=None):
         hoverlabel=dict(bgcolor=STEEL, font=dict(family="IBM Plex Mono", color=MIST)),
     )
     fig.update_xaxes(gridcolor=GUNMETAL, zerolinecolor=GUNMETAL, linecolor=GUNMETAL,
-                     title=dict(text=xtitle, font=dict(size=11, color=MUTED)) if xtitle else None,
-                     tickfont=dict(family="IBM Plex Mono", size=10, color=MUTED))
+                     title=dict(text=xtitle, font=dict(size=12, color=MIST)) if xtitle else None,
+                     tickfont=dict(family="IBM Plex Mono", size=11, color=MUTED))
     fig.update_yaxes(gridcolor=GUNMETAL, zerolinecolor=GUNMETAL, linecolor=GUNMETAL,
-                     title=dict(text=ytitle, font=dict(size=11, color=MUTED)) if ytitle else None,
-                     tickfont=dict(family="IBM Plex Mono", size=10, color=MUTED))
+                     title=dict(text=ytitle, font=dict(size=12, color=MIST)) if ytitle else None,
+                     tickfont=dict(family="IBM Plex Mono", size=11, color=MUTED))
     return fig
