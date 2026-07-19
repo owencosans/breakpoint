@@ -85,39 +85,51 @@ st.markdown("#### How far can finance cut before the sales team is right?")
 
 closest_name = dec.RETAILER_SHORT[closest["retailer"]]
 
+# Peacetime comparison (cached deterministic sweep). Total cash and savings
+# move in OPPOSITE directions under a rival surge — defending costs more, so
+# there is more spend to trim even as the whole curve drops. The two numbers
+# are therefore paired side by side in the hero row, each with its delta, so
+# the inversion is visible without reading a paragraph.
+base_cut = dec.cutline(P["scenario"], -1.0, P["alpha"], P["months"]) if P["war_chest"] >= 0 else None
+surge_drop = (base_cut["npv_at_cutline"] - cut["npv_at_cutline"]) if base_cut else 0.0
+surged = base_cut is not None and surge_drop > 0.02 * abs(base_cut["npv_at_cutline"])
+
 # ---- hero row: the dominant output ----
-h1, h2, h3 = st.columns([2, 2, 2])
+h1, h2, h3, h4 = st.columns([2.1, 2, 2, 1.9])
 with h1:
     ui.hero_card("Cut to here (Cutline)", f"{cutline_pct:.0f}%",
-                 f"recovers {ui.money(cut['recoverable'])} of genuine waste, "
-                 f"every dealer still held")
+                 f"{cut['headroom_pct']*100:.0f}% of room before the Breakpoint "
+                 f"at {bpt_pct:.0f}%")
 with h2:
-    ui.card("Room for error", f"{cut['headroom_pct']*100:.0f}%",
-            f"the gap between the Cutline and the Breakpoint at {bpt_pct:.0f}%",
-            ui.C["amber"])
+    if surged:
+        ui.card("Total cash outcome", ui.money(cut["npv_at_cutline"], digits=0),
+                f"▼ {ui.money(surge_drop, digits=0)} vs peacetime — what the surge costs",
+                ui.C["red"])
+    else:
+        ui.card("Total cash outcome", ui.money(cut["npv_at_cutline"], digits=0),
+                f"at the Cutline, over {P['months']} months", ui.C["mist"])
 with h3:
+    if surged:
+        ui.card("Savings recovered", ui.money(cut["recoverable"], digits=0),
+                f"▲ from {ui.money(base_cut['recoverable'], digits=0)} at peacetime — "
+                f"bigger only because defending costs more", ui.C["amber"])
+    else:
+        ui.card("Savings recovered", ui.money(cut["recoverable"], digits=0),
+                "genuine waste recovered, every dealer held", ui.C["green"])
+with h4:
     col = {"HELD": ui.C["teal"], "PRESSURE": ui.C["amber"],
            "WALKAWAY RISK": ui.C["amber"], "BREAKPOINT": ui.C["red"]}[state]
     ui.card("Where the proposal lands", state,
             f"at the {proposed_pct:.0f}% cut on the control rail", col)
 
-# ---- surge context ----
-# Under a rival surge the "recovers $X" figure INFLATES while the business gets
-# worse: defending costs more, so there is more discretionary spend to trim,
-# even as the whole cash curve drops. Left unexplained, the bigger savings
-# number reads as good news about the surge. Say it before anyone misreads it.
-if P["war_chest"] >= 0:
-    base_cut = dec.cutline(P["scenario"], -1.0, P["alpha"], P["months"])
-    surge_drop = base_cut["npv_at_cutline"] - cut["npv_at_cutline"]
-    if surge_drop > 0.02 * abs(base_cut["npv_at_cutline"]):
-        st.markdown(
-            f'<div class="bp-card" style="border-left:3px solid {ui.C["amber"]}">'
-            f'<b>Reading the savings number under a rival surge:</b> it got bigger because '
-            f'the world got worse. Defending against rival money means more spend on the '
-            f'table to trim — {ui.money(cut["recoverable"])} now — while the total cash '
-            f'outcome sits {ui.money(surge_drop)} below peacetime at the same cut. '
-            f'Read the level of the curve, not just the recovered slice.</div>',
-            unsafe_allow_html=True)
+# one line under the pair, only when the inversion is live — for whoever wants the why
+if surged:
+    st.markdown(
+        f'<div class="bp-card" style="border-left:3px solid {ui.C["amber"]}">'
+        f'The savings number got bigger because the world got worse: defense against rival '
+        f'money leaves more spend to trim, while total cash falls. Read the level of the '
+        f'curve, not just the recovered slice.</div>',
+        unsafe_allow_html=True)
 
 # ---- the decision band ----
 st.plotly_chart(charts.decision_band(cut, P["divest"]), width="stretch")
@@ -129,8 +141,9 @@ with q1:
             "the Cutline — recovering the standoff tax, nothing load-bearing",
             ui.C["teal"])
 with q2:
-    ui.card("What it recovers", ui.money(cut["recoverable"]),
-            "real savings, no door opened", ui.C["green"])
+    ui.card("Room for error", f"{cut['headroom_pct']*100:.0f}%",
+            "between the Cutline and the Breakpoint — past the Cutline, risk "
+            "grows faster than savings", ui.C["amber"])
 with q3:
     cs_state = closest["state"]
     cs_col = {"HELD": ui.C["teal"], "PRESSURE": ui.C["amber"],

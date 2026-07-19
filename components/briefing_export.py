@@ -23,11 +23,18 @@ def build_briefing_html(P, cut, board, state, entry, money_fmt, baseline_cut=Non
     today = date.today().isoformat()
 
     # Under a surge the recovered-savings figure inflates while total cash
-    # falls. The one-pager travels without a narrator, so the caveat must too.
+    # falls. The one-pager travels without a narrator, so the metrics row pairs
+    # the two numbers with their deltas, and section 3 carries the sentence.
     surge_note = ""
+    cash_delta = savings_delta = ""
     if baseline_cut is not None:
         drop = baseline_cut["npv_at_cutline"] - cut["npv_at_cutline"]
         if drop > 0.02 * abs(baseline_cut["npv_at_cutline"]):
+            cash_delta = (f"<div class='d' style='color:#c0392b'>&#9660; "
+                          f"{money_fmt(drop, digits=0)} vs peacetime</div>")
+            savings_delta = (f"<div class='d' style='color:#b9791f'>&#9650; from "
+                             f"{money_fmt(baseline_cut['recoverable'], digits=0)} — defense "
+                             f"costs more</div>")
             surge_note = (f" Note: under the rival surge this savings figure is larger because "
                           f"defense costs more, not because the outlook improved — total cash at "
                           f"the Cutline sits {money_fmt(drop)} below peacetime.")
@@ -88,9 +95,10 @@ def build_briefing_html(P, cut, board, state, entry, money_fmt, baseline_cut=Non
   .head {{ display:flex; justify-content:space-between; align-items:center;
            background:#111820; border-radius:8px; padding:10px 14px; margin-bottom:4px; }}
   .head h1 {{ color:#E6E7E8; }} .head .sub {{ color:#9aa7b2; }}
-  .metrics {{ display:flex; gap:14px; margin:8px 0; }}
-  .metric {{ flex:1; border:1px solid #d3dae0; border-radius:6px; padding:7px 10px; }}
-  .metric .v {{ font-family:'IBM Plex Mono',monospace; font-size:18px; }}
+  .metrics {{ display:flex; gap:10px; margin:8px 0; }}
+  .metric {{ flex:1; border:1px solid #d3dae0; border-radius:6px; padding:7px 9px; }}
+  .metric .v {{ font-family:'IBM Plex Mono',monospace; font-size:15px; }}
+  .metric .d {{ font-family:'IBM Plex Mono',monospace; font-size:8px; margin-top:1px; }}
   .metric .l {{ color:#5c6a76; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; }}
   table {{ width:100%; border-collapse:collapse; margin-top:6px; }}
   th,td {{ text-align:left; padding:4px 8px; border-bottom:1px solid #e2e7ec; font-size:10px; }}
@@ -111,8 +119,10 @@ def build_briefing_html(P, cut, board, state, entry, money_fmt, baseline_cut=Non
   <div class="metrics">
     <div class="metric"><div class="l">Recommended cut</div>
       <div class="v">{cut['cutline_pct']*100:.0f}%</div></div>
+    <div class="metric"><div class="l">Total cash at Cutline</div>
+      <div class="v">{money_fmt(cut['npv_at_cutline'], digits=0)}</div>{cash_delta}</div>
     <div class="metric"><div class="l">Savings recovered</div>
-      <div class="v">{money_fmt(cut['recoverable'])}</div></div>
+      <div class="v">{money_fmt(cut['recoverable'], digits=0)}</div>{savings_delta}</div>
     <div class="metric"><div class="l">Headroom to breakpoint</div>
       <div class="v">{cut['headroom_pct']*100:.0f}%</div></div>
     <div class="metric"><div class="l">Posture</div>
