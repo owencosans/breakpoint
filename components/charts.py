@@ -81,19 +81,26 @@ def stay_vs_leave(pnl_row_stay, pnl_row_defect, switch_cost, label):
 
 
 def cascade_blocks(board, first_defection):
-    """Ordered retailer blocks with propagation cue (spec 9.4)."""
-    labels = [r["retailer"] for r in board]
-    dist = [r["distance"] for r in board]
-    colors = []
-    for r in board:
-        s = r["state"]
-        colors.append({"HELD": th.TEAL, "PRESSURE": th.AMBER,
-                       "WALKAWAY RISK": th.AMBER, "BREAKPOINT": th.RED}.get(s, th.MUTED))
-    fig = go.Figure(go.Bar(x=labels, y=[max(d, 0.02) for d in dist], marker_color=colors,
-                           text=[r["state"] for r in board], textposition="outside",
-                           textfont=dict(family="IBM Plex Mono", size=11)))
-    return th.style(fig, 320, "Order of vulnerability — who flips first, and why the next follows",
-                    ytitle="Safety buffer (× switching cost)")
+    """Ordered dealer blocks with propagation cue (spec 9.4).
+
+    Bar height is the cut depth at which each dealer's own math flips — the
+    measured quantity the ordering uses. Dealers that never break in the sweep
+    are drawn at the top of the range and labelled, rather than dropped."""
+    labels = [r["label"].split(" (")[0] for r in board]
+    top = 0.8
+    depths = [(r["breaks_at"] if r["breaks_at"] is not None else top) * 100 for r in board]
+    colors = [{"HELD": th.TEAL, "PRESSURE": th.AMBER,
+               "WALKAWAY RISK": th.AMBER, "BREAKPOINT": th.RED}.get(r["state"], th.MUTED)
+              for r in board]
+    text = [(f"{r['breaks_at']*100:.0f}%" if r["breaks_at"] is not None else "holds")
+            for r in board]
+    fig = go.Figure(go.Bar(x=labels, y=depths, marker_color=colors,
+                           text=text, textposition="outside",
+                           textfont=dict(family="IBM Plex Mono", size=11), cliponaxis=False))
+    fig = th.style(fig, 320, "Order of vulnerability — who flips first, and why the next follows",
+                   ytitle="Cut depth at which this dealer walks (%)")
+    fig.update_yaxes(range=[0, top * 100 * 1.15])
+    return fig
 
 
 def phase_diagram(ph, b_star, cur_wc, cur_defense):

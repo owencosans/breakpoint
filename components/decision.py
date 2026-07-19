@@ -29,6 +29,10 @@ import retailer as ret        # noqa: E402
 
 MONEY_SCALE = 1.0  # index units are already on a $MM-like scale for the demo
 
+# Cut-depth sweep resolution, shared by cutline() and walkaway_depths() so the
+# two never disagree about what "one step" means.
+GRID_STEP = 0.8 / 32   # 2.5%
+
 RETAILERS = ["HARTLINE", "NOVA", "INDIES"]
 # "INDIES" stays as the engine's internal key; the display name avoids the
 # trade term "independents" — plain-English labels only, per the owner.
@@ -46,13 +50,18 @@ RETAILER_SHORT = {
 }
 
 # Why each one is exposed — the mechanism, not the ranking (Cascade view).
+# Hartline is the LONG-RUN risk, not the near-term one: its disruption cost is
+# the largest on the board, so leaving is worse than staying even unpaid today —
+# but its shelf is hostage to the melting format, so that option appreciates
+# faster than anyone's. Nova and Crosstown can go now; Hartline goes eventually.
 RETAILER_MECHANISM = {
-    "HARTLINE": "roughly three-quarters of its book is contract-plan commission — its "
-                "shelf is hostage to the melting format",
+    "HARTLINE": "the most locked-in dealer today — walking away costs it more than any "
+                "other — but three-quarters of its book is contract-plan commission, so "
+                "the melting format lifts its exit value every year",
     "NOVA": "mostly digital activations, so every rival offer lands where the volume "
             "actually flows and gets a meeting",
-    "INDIES": "competes on price with the lowest switching costs on the board — "
-              "first to flip",
+    "INDIES": "competes on price with the lowest switching costs on the board — least "
+              "to lose by walking, so it moves first",
 }
 
 
@@ -132,16 +141,57 @@ def cutline(scenario: str, war_chest: float, alpha: float, months: int):
     }
 
 
-def retailer_state(distance_frac: float, defected: bool) -> str:
-    """Map a retailer's distance-to-walkaway (safety buffer as a multiple of the
-    switching cost) into one of the four states."""
+def retailer_state(breaks_at, divest: float, defected: bool) -> str:
+    """Map a dealer to one of the four states by how much cut depth separates the
+    proposed cut from the depth at which that dealer's own math flips.
+
+    Driven by the measured break depth, not the old cushion/switching-cost ratio,
+    so the badge agrees with the ordering: a dealer that breaks shallower is
+    shown as more exposed. GRID_STEP is the sweep resolution (2.5%), so PRESSURE
+    means "within two grid steps of going".
+    """
     if defected:
         return "BREAKPOINT"
-    if distance_frac <= 0.0:
+    if breaks_at is None:          # holds across the whole sweep
+        return "HELD"
+    margin = breaks_at - divest
+    if margin <= 0.0:
         return "WALKAWAY RISK"
-    if distance_frac < 0.75:
+    if margin <= 2 * GRID_STEP:
         return "PRESSURE"
     return "HELD"
+
+
+@st.cache_data(show_spinner=True)
+def walkaway_depths(war_chest: float, alpha: float, months: int):
+    """
+    Each dealer's OWN breakpoint: the shallowest cut at which it defects on the
+    deterministic run. This is the honest answer to "who walks first".
+
+    The older ranking divided the payment cushion by the switching cost, but the
+    switching cost is already subtracted inside the outside option — dividing by
+    it again double-counted stickiness and inverted the order, making the most
+    locked-in dealer (Hartline, whose outside option is negative for most of the
+    run) look like the first to go. Ranking by the depth each dealer actually
+    breaks at cannot invert: it is measured, not derived.
+
+    Returns {channel: depth or None if it never defects in range}.
+    """
+    wc = None if war_chest < 0 else war_chest
+    grid = np.linspace(0, 0.8, 33)
+    out = {c: None for c in RETAILERS}
+    remaining = set(RETAILERS)
+    for d in grid:
+        if not remaining:
+            break
+        p = eng.Params(months=months, granite_target_alpha=alpha)
+        lf = eng.default_levers_fn(divest_pct=float(d), war_chest_override=wc)
+        hist = eng.run(p, levers_fn=lf, months=months, seed=None)
+        for c in list(remaining):
+            if (~hist["contract_held"][:, eng.CI[c]]).any():
+                out[c] = float(d)
+                remaining.discard(c)
+    return out
 
 
 @st.cache_data(show_spinner=False)
@@ -157,6 +207,8 @@ def retailer_board(scenario: str, divest: float, war_chest: float, alpha: float,
                  "trade_bid": R["trade_bid"], "granite_pay": R["granite_pay"]}
     pnl = ret.pnl_timeseries(hist_like, p)
 
+    depths = walkaway_depths(war_chest, alpha, months)
+
     rows = []
     t = R["months"] - 1
     for c in RETAILERS:
@@ -167,25 +219,31 @@ def retailer_board(scenario: str, divest: float, war_chest: float, alpha: float,
         premium = d["defection_premium"][t]           # defect - switchcost - stay
         walkaway_pay = R["O_c"][t, ci]                # payment level at which O == W
         current_pay = R["granite_pay"][t, ci]
-        # Distance to walkaway: the safety buffer as a fraction of the switching
-        # cost that stands between the retailer and indifference. premium<0 means
-        # staying wins; the closer premium is to 0 (relative to switch cost), the
-        # closer to flipping. Entrant money that lifts the defect side shrinks
-        # this correctly.
+        # Retained as a diagnostic only — see walkaway_depths() for why it must
+        # not drive the ordering or the state.
         switch = max(d["switching_cost"], 1e-6)
         distance = (-premium) / switch
         defected = not R["contract_held"][t, ci]
+        # How attractive leaving is in absolute terms. Negative = the dealer is
+        # better off staying even with no payment at all: structurally locked in.
+        outside_option = float(walkaway_pay)
         rows.append({
             "retailer": c, "label": RETAILER_LABEL[c],
             "stay": stay, "defect": defect, "premium": premium,
             "walkaway_pay": walkaway_pay, "current_pay": current_pay,
             "distance": distance, "defected": defected,
+            "outside_option": outside_option,
+            "breaks_at": depths[c],          # None = holds across the whole sweep
             "economic_T_star": d["economic_T_star"],
-            "state": retailer_state(distance, defected),
+            "state": retailer_state(depths[c], divest, defected),
             "rival_offer_required": max(0.0, walkaway_pay),
         })
-    # closest to walkaway first
-    rows.sort(key=lambda r: (not r["defected"], r["distance"]))
+    # Order of vulnerability: already-gone first, then by the cut depth at which
+    # each dealer breaks (shallowest = first domino), ties broken by how
+    # attractive leaving is. Dealers that never break sort last.
+    rows.sort(key=lambda r: (not r["defected"],
+                             r["breaks_at"] if r["breaks_at"] is not None else 99.0,
+                             -r["outside_option"]))
     return rows
 
 

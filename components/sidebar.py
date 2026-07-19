@@ -43,8 +43,13 @@ def control_rail():
         war_chest = st.slider("Rival funding (index $/mo)", -1.0, 600.0,
                               step=20.0, key="bp_wc",
                               help="-1 = baseline (no surge). Raise to model an entrant bringing money.")
-        alpha = st.slider("Tolerated walkaway risk", 0.01, 0.15,
-                          step=0.01, key="bp_alpha")
+        alpha = st.slider("Tolerated walkaway risk (per dealer, per month)", 0.01, 0.15,
+                          step=0.01, key="bp_alpha",
+                          help="Payments are set to hold each dealer's monthly defection "
+                               "probability at this level. It is a monthly hazard, not a "
+                               "horizon risk — 5%/month compounds to near-certain defection "
+                               "over 60 months, which is why the headline Cutline and "
+                               "Breakpoint come from the deterministic run.")
         months = st.slider("Horizon (months)", 24, 60, 60, 12, key="bp_months")
 
         st.markdown("---")

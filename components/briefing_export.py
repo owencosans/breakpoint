@@ -44,7 +44,8 @@ def build_briefing_html(P, cut, board, state, entry, money_fmt, baseline_cut=Non
 
     rows = "".join(
         f"<tr><td>{r['label']}</td><td class='num'>{r['stay']:.1f}</td>"
-        f"<td class='num'>{r['defect']:.1f}</td><td class='num'>{r['distance']:+.2f}</td>"
+        f"<td class='num'>{r['defect']:.1f}</td>"
+        f"<td class='num'>{(format(r['breaks_at']*100, '.0f') + '%') if r.get('breaks_at') is not None else 'holds'}</td>"
         f"<td class='num'>{r['rival_offer_required']:.1f}</td>"
         f"<td><span class='state' style='color:{_state_c(r['state'])}'>{r['state']}</span></td></tr>"
         for r in board)
@@ -67,9 +68,11 @@ def build_briefing_html(P, cut, board, state, entry, money_fmt, baseline_cut=Non
                        f"but short of the Breakpoint: from here each further point buys less "
                        f"saving and more risk.")
         else:
+            brk = closest.get("breaks_at")
+            brk_txt = (f"its own math flips at a {brk*100:.0f}% cut" if brk is not None
+                       else "it holds across the modelled range")
             posture = (f"{tension} The proposed cut is inside the Cutline, but {closest['label']} "
-                       f"is already near its walkaway point on current dealer economics — the "
-                       f"buffer is {closest['distance']:+.2f}× its switching cost.")
+                       f"is the thinnest link on current dealer economics — {brk_txt}.")
     else:
         posture = (f"{tension} The recommended cut recovers {money_fmt(cut['recoverable'])} "
                    f"while preserving every current dealer relationship.")
@@ -154,10 +157,13 @@ def build_briefing_html(P, cut, board, state, entry, money_fmt, baseline_cut=Non
      Breakpoint at {cut['breakpoint_pct']*100:.0f}%. The margin between the two is the room for
      error before controlled decline becomes collapse.{surge_note}</p>
 
-  <h2>4 · Closest dealer threshold</h2>
-  <p><b>{closest['label']}</b> sits closest to walking, with a safety buffer of
-     {closest['distance']:+.2f}× its switching cost. A rival offer near
-     {closest['rival_offer_required']:.1f} would tip it.</p>
+  <h2>4 · First dealer to break</h2>
+  <p><b>{closest['label']}</b> is first to go: its own math flips at a
+     {(format(closest['breaks_at']*100, '.0f') + '% cut') if closest.get('breaks_at') is not None else 'cut beyond the modelled range'},
+     shallower than any other dealer. A rival offer near
+     {closest['rival_offer_required']:.1f} would tip it. Order of vulnerability tracks how
+     little each dealer loses by leaving — the largest dealer is the most locked in today,
+     but the declining format lifts its exit value every year.</p>
 
   <h2>5 · Competitive vulnerability</h2>
   <p>Entry Pressure — the rival funding level that tips at least two dealers — is
@@ -167,7 +173,7 @@ def build_briefing_html(P, cut, board, state, entry, money_fmt, baseline_cut=Non
 
   <h2>6 · Cascade exposure</h2>
   <table><tr><th>Dealer</th><th class="num">Stays</th><th class="num">Leaves</th>
-    <th class="num">Buffer</th><th class="num">Rival $ to tip</th><th>State</th></tr>
+    <th class="num">Breaks at cut</th><th class="num">Rival $ to tip</th><th>State</th></tr>
     {rows}</table>
 
   <h2>7 · Assumptions and what would change the recommendation</h2>

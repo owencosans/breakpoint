@@ -163,9 +163,11 @@ with q3:
     cs_state = closest["state"]
     cs_col = {"HELD": ui.C["teal"], "PRESSURE": ui.C["amber"],
               "WALKAWAY RISK": ui.C["amber"], "BREAKPOINT": ui.C["red"]}[cs_state]
+    breaks = closest["breaks_at"]
+    depth_txt = (f"breaks at a {breaks*100:.0f}% cut" if breaks is not None
+                 else "holds across the whole sweep")
     ui.card("Who walks first", closest_name,
-            f"{closest['distance']:.2f}× switching-cost buffer left — "
-            f"{dec.RETAILER_MECHANISM[closest['retailer']]}", cs_col)
+            f"{depth_txt} — {dec.RETAILER_MECHANISM[closest['retailer']]}", cs_col)
 with q4:
     ui.card("If you overshoot", f"{bpt_pct:.0f}%+",
             f"cut past this → {closest_name}'s math flips → the shelf opens to NORD, "
@@ -188,10 +190,13 @@ elif state in ("PRESSURE", "WALKAWAY RISK"):
                 f'buys less saving and more risk — and {closest_name} is the one nearest its '
                 f'walkaway point.')
     else:
+        brk = closest["breaks_at"]
+        brk_txt = (f'its own math flips at a {brk*100:.0f}% cut' if brk is not None
+                   else 'it holds across the whole sweep')
         body = (f'The proposed cut is inside the Cutline ({cutline_pct:.0f}%), but the pressure is '
-                f'not coming from the cut — {closest_name} is already close to its walkaway point '
-                f'on the current dealer economics, with {closest["distance"]:.2f}× of switching-cost '
-                f'buffer left. Cutting toward the Breakpoint ({bpt_pct:.0f}%) spends that buffer.')
+                f'not coming from the cut — {closest_name} is the thinnest link on the current '
+                f'dealer economics ({brk_txt}). Cutting toward the Breakpoint ({bpt_pct:.0f}%) '
+                f'spends that margin.')
     st.markdown(
         f'<div class="bp-card" style="border-left:3px solid {ui.C["amber"]}">{body}</div>',
         unsafe_allow_html=True)

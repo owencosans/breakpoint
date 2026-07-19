@@ -42,7 +42,7 @@ tbl = pd.DataFrame([{
     "Stays (all-in)": f"{r['stay']:.1f}",
     "Leaves (net)": f"{r['defect']:.1f}",
     "Walkaway pay": f"{r['walkaway_pay']:.1f}",
-    "Buffer (× switch)": f"{r['distance']:+.2f}",
+    "Breaks at cut": (f"{r['breaks_at']*100:.0f}%" if r["breaks_at"] is not None else "holds"),
     "Rival $ to tip": f"{r['rival_offer_required']:.1f}",
     "State": r["state"],
 } for r in board])

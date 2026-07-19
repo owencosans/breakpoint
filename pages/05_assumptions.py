@@ -71,8 +71,10 @@ GROUPS = {
     "Our posture": [
         ("Defense budget ceiling", f"{p.granite_defense_budget_mult:.2f}× base spend",
          "We cannot out-pay a surge everywhere at once; we ration toward what matters."),
-        ("Tolerated walkaway risk", f"{P['alpha']*100:.0f}%",
-         "How much defection probability we accept when setting payments."),
+        ("Tolerated walkaway risk (per dealer, per month)", f"{P['alpha']*100:.0f}%/mo",
+         "Payments hold each dealer's monthly defection probability here. A monthly "
+         "hazard, not a horizon risk — which is why the headline boundaries come from "
+         "the deterministic run rather than the stochastic one."),
     ],
 }
 
