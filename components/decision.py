@@ -30,17 +30,19 @@ import retailer as ret        # noqa: E402
 MONEY_SCALE = 1.0  # index units are already on a $MM-like scale for the demo
 
 RETAILERS = ["HARTLINE", "NOVA", "INDIES"]
+# "INDIES" stays as the engine's internal key; the display name avoids the
+# trade term "independents" — plain-English labels only, per the owner.
 RETAILER_LABEL = {
     "HARTLINE": "Hartline (legacy-heavy)",
     "NOVA": "Nova (growth-heavy)",
-    "INDIES": "Independents",
+    "INDIES": "Crosstown Mobile (price-led)",
 }
 
 # Bare names, for copy that reads as a sentence rather than a table cell.
 RETAILER_SHORT = {
     "HARTLINE": "Hartline",
     "NOVA": "Nova",
-    "INDIES": "the Independents",
+    "INDIES": "Crosstown",
 }
 
 # Why each one is exposed — the mechanism, not the ranking (Cascade view).
@@ -49,7 +51,8 @@ RETAILER_MECHANISM = {
                 "shelf is hostage to the melting format",
     "NOVA": "mostly digital activations, so every rival offer lands where the volume "
             "actually flows and gets a meeting",
-    "INDIES": "price-led and the lowest switching costs on the board — first to flip",
+    "INDIES": "competes on price with the lowest switching costs on the board — "
+              "first to flip",
 }
 
 

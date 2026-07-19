@@ -3,6 +3,7 @@ what cut, how much headroom, who's closest to walking, what if we overshoot."""
 
 import sys
 from pathlib import Path
+import numpy as np
 import streamlit as st
 
 _ROOT = Path(__file__).resolve().parent.parent
@@ -119,8 +120,22 @@ with h3:
 with h4:
     col = {"HELD": ui.C["teal"], "PRESSURE": ui.C["amber"],
            "WALKAWAY RISK": ui.C["amber"], "BREAKPOINT": ui.C["red"]}[state]
-    ui.card("Where the proposal lands", state,
-            f"at the {proposed_pct:.0f}% cut on the control rail", col)
+    # Grade the proposal in dollars, not just a state word. The envelope
+    # (Cutline / Breakpoint / cash-at-Cutline) describes the WORLD and is
+    # identical across scenarios that share rival money and risk tolerance —
+    # this card is where the scenario's actual proposal shows its cost.
+    prop_gap = max(0.0, cut["npv_at_cutline"]
+                   - float(np.interp(P["divest"], cut["grid"], cut["npv"])))
+    if P["divest"] < cut["cutline_pct"]:
+        prop_sub = (f"at the {proposed_pct:.0f}% cut — {ui.money(prop_gap, digits=0)} of "
+                    f"recoverable waste still on the table")
+    elif P["divest"] < cut["breakpoint_pct"]:
+        prop_sub = (f"at the {proposed_pct:.0f}% cut — inside the margin for error, "
+                    f"risk growing faster than savings")
+    else:
+        prop_sub = (f"at the {proposed_pct:.0f}% cut — {ui.money(prop_gap, digits=0)} below "
+                    f"the Cutline outcome, and lost dealers don't come back")
+    ui.card("Where the proposal lands", state, prop_sub, col)
 
 # one line under the pair, only when the inversion is live — for whoever wants the why
 if surged:
