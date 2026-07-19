@@ -22,18 +22,29 @@ def control_rail():
                                 label_visibility="collapsed", key="bp_scenario")
         st.caption(pr.SCENARIOS[scenario]["blurb"])
 
+        # A scenario IS its slider posture (presets.py sets nothing else), and
+        # keyed sliders keep their session value across reruns — so the presets
+        # must be loaded through session state, or picking a scenario changes
+        # the blurb and nothing else. The sliders therefore take no value= arg:
+        # session state is the single source of their position.
+        spec = pr.SCENARIOS[scenario]
+        wc_preset = -1.0 if spec["war_chest"] is None else float(spec["war_chest"])
+        if st.session_state.get("bp_loaded_scenario") != scenario:
+            st.session_state["bp_loaded_scenario"] = scenario
+            st.session_state["bp_divest"] = float(spec["divest_pct"])
+            st.session_state["bp_wc"] = wc_preset
+            st.session_state["bp_alpha"] = float(spec["granite_target_alpha"])
+
         st.markdown("---")
         ui.eyebrow("Decision controls")
-        spec = pr.SCENARIOS[scenario]
         divest = st.slider("Proposed investment reduction", 0.0, 0.8,
-                           float(spec["divest_pct"]), 0.05, key="bp_divest",
+                           step=0.05, key="bp_divest",
                            help="How much discretionary channel investment to cut.")
-        wc_default = -1.0 if spec["war_chest"] is None else spec["war_chest"]
         war_chest = st.slider("Rival funding (index $/mo)", -1.0, 600.0,
-                              float(wc_default), 20.0, key="bp_wc",
+                              step=20.0, key="bp_wc",
                               help="-1 = baseline (no surge). Raise to model an entrant bringing money.")
         alpha = st.slider("Tolerated walkaway risk", 0.01, 0.15,
-                          float(spec["granite_target_alpha"]), 0.01, key="bp_alpha")
+                          step=0.01, key="bp_alpha")
         months = st.slider("Horizon (months)", 24, 60, 60, 12, key="bp_months")
 
         st.markdown("---")
