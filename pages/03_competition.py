@@ -45,7 +45,9 @@ with c2:
     st.markdown(
         "Raise **Rival funding** in the control rail past Entry Pressure and watch the first "
         "defection move forward. A rival's money doesn't just fight for customers — it enters "
-        "every retailer's leave-vs-stay math at once.")
+        "every retailer's leave-vs-stay math at once. One side effect to read correctly: a "
+        "surge also *inflates* the savings figure on the Decision page, because costlier "
+        "defense leaves more spend to trim — while total cash falls.")
 
 st.caption("Green = stable. Amber = contested. Red = the rival funding level where defections "
            "cascade. The white × is where you are. The distance from it to the red region is how "

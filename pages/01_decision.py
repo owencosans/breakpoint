@@ -101,6 +101,24 @@ with h3:
     ui.card("Where the proposal lands", state,
             f"at the {proposed_pct:.0f}% cut on the control rail", col)
 
+# ---- surge context ----
+# Under a rival surge the "recovers $X" figure INFLATES while the business gets
+# worse: defending costs more, so there is more discretionary spend to trim,
+# even as the whole cash curve drops. Left unexplained, the bigger savings
+# number reads as good news about the surge. Say it before anyone misreads it.
+if P["war_chest"] >= 0:
+    base_cut = dec.cutline(P["scenario"], -1.0, P["alpha"], P["months"])
+    surge_drop = base_cut["npv_at_cutline"] - cut["npv_at_cutline"]
+    if surge_drop > 0.02 * abs(base_cut["npv_at_cutline"]):
+        st.markdown(
+            f'<div class="bp-card" style="border-left:3px solid {ui.C["amber"]}">'
+            f'<b>Reading the savings number under a rival surge:</b> it got bigger because '
+            f'the world got worse. Defending against rival money means more spend on the '
+            f'table to trim — {ui.money(cut["recoverable"])} now — while the total cash '
+            f'outcome sits {ui.money(surge_drop)} below peacetime at the same cut. '
+            f'Read the level of the curve, not just the recovered slice.</div>',
+            unsafe_allow_html=True)
+
 # ---- the decision band ----
 st.plotly_chart(charts.decision_band(cut, P["divest"]), width="stretch")
 

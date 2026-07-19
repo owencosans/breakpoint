@@ -26,8 +26,10 @@ cut = dec.cutline(P["scenario"], P["war_chest"], P["alpha"], P["months"])
 board = dec.retailer_board(P["scenario"], P["divest"], P["war_chest"], P["alpha"], P["months"])
 state = dec.overall_state(board, cut, P["divest"])
 entry = dec.entry_pressure(P["scenario"], P["alpha"], P["months"])
+# peacetime comparison, so the export can caveat the surge-inflated savings figure
+baseline_cut = dec.cutline(P["scenario"], -1.0, P["alpha"], P["months"]) if P["war_chest"] >= 0 else None
 
-html = build_briefing_html(P, cut, board, state, entry, ui.money)
+html = build_briefing_html(P, cut, board, state, entry, ui.money, baseline_cut=baseline_cut)
 
 c1, c2 = st.columns([1, 1])
 with c1:

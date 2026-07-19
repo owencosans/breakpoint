@@ -15,10 +15,22 @@ def _wordmark_uri():
     return "data:image/png;base64," + base64.b64encode(raw).decode()
 
 
-def build_briefing_html(P, cut, board, state, entry, money_fmt) -> str:
+def build_briefing_html(P, cut, board, state, entry, money_fmt, baseline_cut=None) -> str:
+    """baseline_cut: the peacetime cutline dict, passed only when the scenario
+    runs a rival surge — used to caveat the inflated savings figure."""
     closest = board[0]
     scenario = P["scenario"]
     today = date.today().isoformat()
+
+    # Under a surge the recovered-savings figure inflates while total cash
+    # falls. The one-pager travels without a narrator, so the caveat must too.
+    surge_note = ""
+    if baseline_cut is not None:
+        drop = baseline_cut["npv_at_cutline"] - cut["npv_at_cutline"]
+        if drop > 0.02 * abs(baseline_cut["npv_at_cutline"]):
+            surge_note = (f" Note: under the rival surge this savings figure is larger because "
+                          f"defense costs more, not because the outlook improved — total cash at "
+                          f"the Cutline sits {money_fmt(drop)} below peacetime.")
 
     state_color = {"HELD": "#2b8a7f", "PRESSURE": "#b9791f",
                    "WALKAWAY RISK": "#b9791f", "BREAKPOINT": "#c0392b"}[state]
@@ -130,7 +142,7 @@ def build_briefing_html(P, cut, board, state, entry, money_fmt) -> str:
   <p>The recommended cut of {cut['cutline_pct']*100:.0f}% recovers
      {money_fmt(cut['recoverable'])} relative to paying full freight, while remaining below the
      Breakpoint at {cut['breakpoint_pct']*100:.0f}%. The margin between the two is the room for
-     error before controlled decline becomes collapse.</p>
+     error before controlled decline becomes collapse.{surge_note}</p>
 
   <h2>4 · Closest dealer threshold</h2>
   <p><b>{closest['label']}</b> sits closest to walking, with a safety buffer of
