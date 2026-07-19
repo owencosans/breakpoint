@@ -1,0 +1,7 @@
+streamlit>=1.40
+plotly>=5.24
+numpy>=1.26
+pandas>=2.0
+# pytest only needed to run the test suite, not the app:
+pytest>=8.0
+cairosvg  # only needed to regenerate PNG assets, not to run

@@ -1,0 +1,103 @@
+/* ============================================================================
+   BREAKPOINT — design system stylesheet
+   Palette: spec section 6. Typography: spec section 7. Surfaces: spec section 14.
+   ============================================================================ */
+
+:root {
+  --bp-carbon:   #111820;  /* main background */
+  --bp-slate:    #202B35;  /* raised surface */
+  --bp-steel:    #18222B;  /* secondary surface */
+  --bp-mist:     #E6E7E8;  /* primary text */
+  --bp-muted:    #83919C;  /* secondary text */
+  --bp-gunmetal: #34414C;  /* divider */
+  --bp-amber:    #FFB000;  /* signal / selected */
+  --bp-teal:     #3FA7A0;  /* stable / current */
+  --bp-red:      #D94B4B;  /* danger / breakpoint only */
+  --bp-green:    #77B89B;  /* positive delta */
+}
+
+/* ---- ground & base type ------------------------------------------------- */
+.stApp { background: var(--bp-carbon); color: var(--bp-mist); }
+
+.stApp, p, label, span, div, li {
+  font-family: "Inter", "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+h1, h2, h3, h4 {
+  font-family: "IBM Plex Serif", "Source Serif 4", Georgia, serif;
+  color: var(--bp-mist); font-weight: 600; letter-spacing: -0.01em;
+}
+
+/* section eyebrow / label */
+.bp-eyebrow {
+  color: var(--bp-amber); font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+}
+
+/* ---- sidebar as a control rail ----------------------------------------- */
+section[data-testid="stSidebar"] {
+  background: var(--bp-steel); border-right: 1px solid var(--bp-gunmetal);
+}
+section[data-testid="stSidebar"] .stMarkdown { color: var(--bp-mist); }
+
+/* ---- metric / summary cards -------------------------------------------- */
+.bp-card {
+  background: var(--bp-slate); border: 1px solid var(--bp-gunmetal);
+  border-radius: 8px; padding: 14px 16px; margin-bottom: 8px;
+}
+.bp-card-value {
+  font-family: "IBM Plex Mono", monospace; font-size: 2.0rem;
+  color: var(--bp-mist); line-height: 1.05; font-variant-numeric: tabular-nums;
+}
+.bp-card-label { color: var(--bp-muted); font-size: 0.76rem;
+  text-transform: uppercase; letter-spacing: 0.08em; }
+.bp-card-sub { color: var(--bp-muted); font-size: 0.8rem; margin-top: 2px; }
+
+/* dominant executive card (Decision screen) */
+.bp-hero {
+  background: linear-gradient(180deg, var(--bp-slate), var(--bp-steel));
+  border: 1px solid var(--bp-gunmetal); border-left: 3px solid var(--bp-amber);
+  border-radius: 10px; padding: 22px 24px;
+}
+.bp-hero-value {
+  font-family: "IBM Plex Mono", monospace; font-size: 2.9rem; color: var(--bp-mist);
+  line-height: 1; font-variant-numeric: tabular-nums;
+}
+
+/* ---- status badges ------------------------------------------------------ */
+.bp-badge {
+  display: inline-block; font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem; letter-spacing: 0.1em; padding: 3px 10px;
+  border-radius: 4px; border: 1px solid transparent;
+}
+.bp-held      { color: var(--bp-teal);  border-color: var(--bp-teal);  background: rgba(50,166,160,0.10); }
+.bp-pressure  { color: var(--bp-amber); border-color: var(--bp-amber); background: rgba(233,162,59,0.10); }
+.bp-walkaway  { color: var(--bp-amber); border-color: var(--bp-amber); background: rgba(233,162,59,0.18);
+                border-width: 1.5px; font-weight: 600; }
+.bp-breakpoint{ color: var(--bp-red);   border-color: var(--bp-red);   background: rgba(217,75,75,0.14); font-weight: 600; }
+
+/* ---- warning block ------------------------------------------------------ */
+.bp-warn {
+  background: rgba(217,75,75,0.08); border: 1px solid var(--bp-red);
+  border-radius: 8px; padding: 14px 16px; color: var(--bp-mist);
+}
+.bp-warn-title { color: var(--bp-red); font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+
+/* ---- tabs (fallback nav if used) --------------------------------------- */
+.stTabs [data-baseweb="tab-list"] { gap: 2px; border-bottom: 1px solid var(--bp-gunmetal); }
+.stTabs [data-baseweb="tab"] { background: var(--bp-steel); color: var(--bp-muted);
+  border-radius: 6px 6px 0 0; padding: 8px 16px; }
+.stTabs [aria-selected="true"] { background: var(--bp-slate); color: var(--bp-mist); }
+
+/* ---- sliders ------------------------------------------------------------ */
+.stSlider [data-baseweb="slider"] div[role="slider"] { background: var(--bp-amber); }
+
+/* ---- misc --------------------------------------------------------------- */
+hr { border-color: var(--bp-gunmetal); }
+.stApp a { color: var(--bp-amber); }
+[data-testid="stMetricValue"] { font-family: "IBM Plex Mono", monospace; }
+
+/* remove default Streamlit chrome noise */
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
+[data-testid="stDecoration"] { display: none; }

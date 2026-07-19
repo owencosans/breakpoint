@@ -1,0 +1,5 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Breakpoint">
+  <path d="M6 28 L34 28" stroke="#111820" stroke-width="3.2" stroke-linecap="square"/>
+  <path d="M34 28 L52 52" stroke="#D94B4B" stroke-width="3.2" stroke-linecap="square"/>
+  <circle cx="34" cy="28" r="2.6" fill="#111820"/>
+</svg>

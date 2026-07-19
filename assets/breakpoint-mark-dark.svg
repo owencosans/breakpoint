@@ -1,0 +1,7 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Breakpoint">
+  <!-- stable line, then a structural break downward at the midpoint -->
+  <path d="M6 28 L34 28" stroke="#D6DEE3" stroke-width="3.2" stroke-linecap="square"/>
+  <path d="M34 28 L52 52" stroke="#D94B4B" stroke-width="3.2" stroke-linecap="square"/>
+  <!-- the break node -->
+  <circle cx="34" cy="28" r="2.6" fill="#E9A23B"/>
+</svg>

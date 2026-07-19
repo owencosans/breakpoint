@@ -1,0 +1,10 @@
+<svg width="330" height="58" viewBox="0 0 330 58" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Breakpoint">
+  <text x="8" y="42" font-family="'IBM Plex Serif', Georgia, serif" font-size="30"
+        font-weight="600" letter-spacing="2" fill="#111820">BREAK</text>
+  <text x="176" y="42" font-family="'IBM Plex Serif', Georgia, serif" font-size="30"
+        font-weight="600" letter-spacing="2" fill="#111820">POINT</text>
+  <path d="M8 50 L150 50" stroke="#83919C" stroke-width="2" stroke-linecap="square"/>
+  <path d="M150 50 L168 57" stroke="#D94B4B" stroke-width="2.4" stroke-linecap="square"/>
+  <path d="M168 51 L322 51" stroke="#83919C" stroke-width="2" stroke-linecap="square"/>
+  <circle cx="150" cy="50" r="2.4" fill="#E9A23B"/>
+</svg>
