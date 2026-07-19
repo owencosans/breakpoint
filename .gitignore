@@ -27,9 +27,6 @@ Thumbs.db
 # Stale build artifacts / older copies (not referenced by the app)
 mnt/
 
-# Private working notes — keep out of any shared/public repo per handoff §0
-HANDOFF.md
-SKIN_TELECOM.md
-NAMING_BRIEF.md
-tollgate_spec_v1.md
-STORY_AND_POLISH.md
+# Working notes stay local — only README ships
+*.md
+!README.md

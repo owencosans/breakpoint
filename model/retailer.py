@@ -1,5 +1,5 @@
 """
-TOLLGATE v1.1 -- Structural retailer P&L.
+BREAKPOINT model -- Structural retailer P&L.
 
 Replaces the reduced-form outside option (competing bid + drift x decline)
 with an actual dealer profit-and-loss comparison. For each channel c at each

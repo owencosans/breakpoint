@@ -5,8 +5,8 @@
 A war-room simulator that identifies how far channel investment can fall before
 retailers walk, competitors enter, and controlled decline becomes collapse.
 
-Demonstrated with a stylized wireless-telecom skin (dealer contract plans vs.
-digital eSIM). The skin is a disguise — the model is category-neutral.
+Demonstrated with a stylized, fictional wireless-telecom market (dealer
+contract plans vs. digital eSIM). The model itself is category-neutral.
 
 ## Run
 
@@ -77,4 +77,4 @@ cd model && python -m pytest test_engine.py -v -s
 
 Stylized market, illustrative index-unit figures calibrated from public
 benchmarks. No client or employer data. Programs modeled on proportionally
-equal terms. Keep any private working docs out of a shared repo.
+equal terms. All companies and figures are fictional.

@@ -1,5 +1,5 @@
 """
-TOLLGATE v1.0 -- Scenario presets (build spec section 5 sidebar).
+BREAKPOINT model -- Scenario presets (build spec section 5 sidebar).
 Each preset returns a (Params, levers_fn) pair so app.py can run it directly.
 Presets are thin: they set a few Params fields and choose the default levers_fn
 knobs (divest %, entrant war chest). The heterogeneity and mechanics all live

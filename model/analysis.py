@@ -1,5 +1,5 @@
 """
-TOLLGATE v1.0 -- Analysis layer for the app tabs.
+BREAKPOINT model -- Analysis layer for the app tabs.
 Derived quantities that sit on top of engine.run(): the gap S-curve and
 local-vs-arc elasticity pair (Tab 2), the divestment frontier (Tab 4), and
 the invasion phase grid + B* bisection (Tab 5). Kept separate from engine.py

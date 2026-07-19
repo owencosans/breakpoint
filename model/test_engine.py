@@ -1,5 +1,5 @@
 """
-TOLLGATE v1.0 -- Engine test suite.
+BREAKPOINT model -- Engine test suite.
 Run: python -m pytest test_engine.py -v -s
 Saturday exit criterion (build spec section 8): this file green + calibration
 targets hit, before any Streamlit/UI work starts.

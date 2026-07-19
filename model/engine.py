@@ -1,6 +1,6 @@
 """
-TOLLGATE v1.0 -- Simulation Engine
-Params, MarketState, step(), run(). See build spec (tollgate_spec_v1.md)
+BREAKPOINT model -- Simulation Engine
+Params, MarketState, step(), run(). See the build spec
 sections 1-3 and 6.
 
 SCOPE NOTE: this file plus mechanics.py are the Saturday deliverable

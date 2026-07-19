@@ -1,7 +1,7 @@
 """
-TOLLGATE v1.0 -- Mechanics
+BREAKPOINT model -- Mechanics
 Pure functions implementing the hazard/contest/participation math from
-build spec (tollgate_spec_v1.md) section 3. Everything is vectorized NumPy;
+build spec section 3. Everything is vectorized NumPy;
 no Python-level loops over individual consumers.
 
 Zero external dependencies beyond numpy + stdlib math, so the app deploys
