@@ -50,16 +50,14 @@ def control_rail():
                                "horizon risk — 5%/month compounds to near-certain defection "
                                "over 60 months, which is why the headline Cutline and "
                                "Breakpoint come from the deterministic run.")
-        # Ceiling raised past 60 deliberately. Under a rival surge the deep-cut
-        # ("harvest") advantage PEAKS near 60 months and only reverses around
-        # 13 years — at 60 months alone the chart appears to argue against the
-        # app's own thesis. The horizon has to be draggable far enough to see
-        # the crossover, or the contradiction can't be answered on screen.
-        months = st.slider("Horizon (months)", 24, 180, 60, 12, key="bp_months",
-                           help="How far ahead cash is accumulated. Under a rival surge, "
-                                "cutting deep looks best inside ~10 years and loses beyond "
-                                "~13 — the cost of a lost dealer lands after the usual "
-                                "measurement window. Drag right to see it.")
+        # Ceiling stays at 60: that is the horizon the engine is calibrated and
+        # tested at (every test in test_engine.py runs at <=60 months). Beyond
+        # it the s4 inflow tap — which compounds at 15%/yr with no saturation —
+        # grows the category several times over, inverting the declining-format
+        # premise the whole model rests on. Long runs are not evidence here.
+        months = st.slider("Horizon (months)", 24, 60, 60, 12, key="bp_months",
+                           help="How far ahead cash is accumulated. Capped at 60 months: "
+                                "that is the range the model is calibrated and tested at.")
 
         st.markdown("---")
         st.caption("Stylized market. No client or employer data. Programs modeled "

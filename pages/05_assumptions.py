@@ -62,6 +62,20 @@ GROUPS = {
         ("Rival reinvestment as it grows", f"{p.nordkapp_reinvest_annual*100:.0f}%/yr",
          "The leader compounds its spend as the growth category expands."),
     ],
+    "Range of validity": [
+        ("Horizon the model is calibrated at", f"{p.months} months",
+         "Every engine test runs at 60 months or less. The results are not "
+         "extrapolations beyond that window."),
+        ("New-to-category inflow growth", f"{p.s4_g_annual*100:.0f}%/yr",
+         "New customers arrive through the growth format and the inflow itself "
+         "compounds, with no saturation term. Sensible over five years; run it "
+         "for fifteen and it would grow the category several times over, which "
+         "is why the horizon is capped."),
+        ("What the cash number omits", "terminal value",
+         "Cash stops at the horizon: no continuing value is credited for holding "
+         "a dealer relationship past it, and a lost dealer can be bought back. "
+         "Both make deep cuts look better than the story argues they are."),
+    ],
     "Retention & recovery": [
         ("Switching cost buffer", ", ".join(f"{(p.stickiness_factor*p.W_c0)[i]:.1f}" for i in range(3)),
          "Disruption cost that keeps a retailer in place near indifference."),
