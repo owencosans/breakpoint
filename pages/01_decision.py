@@ -149,6 +149,51 @@ if surged:
 # ---- the decision band ----
 st.plotly_chart(charts.decision_band(cut, P["divest"]), width="stretch")
 
+# ---- horizon-truncation warning ----
+# When the post-Breakpoint region out-earns the Cutline, the chart appears to
+# argue for cutting past the cliff. On this model that is a horizon artifact:
+# the harvest advantage peaks near 60 months and reverses once the cost of a
+# lost dealer has time to compound. Say so, and prove it by re-running long.
+post_mask = cut["grid"] > cut["breakpoint_pct"]
+post = cut["npv"][post_mask]
+if len(post) and float(post.max()) > cut["npv_at_cutline"]:
+    gain_now = float(post.max()) - cut["npv_at_cutline"]
+    # The two POLICIES being compared, as cut depths. Re-running the same two
+    # depths at a longer horizon is the like-for-like test; comparing
+    # "post-Breakpoint vs Cutline" at the long horizon is not, because both
+    # boundaries move (under a sustained surge they collapse toward 0%).
+    d_hold = float(cut["cutline_pct"])
+    d_deep = float(cut["grid"][post_mask][int(np.argmax(post))])
+    long_h = 180
+    if P["months"] < long_h:
+        long_cut = dec.cutline(P["scenario"], P["war_chest"], P["alpha"], long_h)
+        hold_long = float(np.interp(d_hold, long_cut["grid"], long_cut["npv"]))
+        deep_long = float(np.interp(d_deep, long_cut["grid"], long_cut["npv"]))
+        gain_long = deep_long - hold_long
+        if gain_long < 0:
+            verdict = (f"Run the same two policies out to {long_h//12} years and it reverses: "
+                       f"the {d_deep*100:.0f}% cut ends {ui.money(abs(gain_long), digits=0)} "
+                       f"<b>behind</b> the {d_hold*100:.0f}% cut.")
+        else:
+            verdict = (f"At {long_h//12} years the {d_deep*100:.0f}% cut still leads by "
+                       f"{ui.money(gain_long, digits=0)} on cash alone.")
+        st.markdown(
+            f'<div class="bp-warn"><div class="bp-warn-title">Read the horizon before you '
+            f'read this chart</div>At {P["months"]} months, cutting past the Breakpoint appears '
+            f'to earn {ui.money(gain_now, digits=0)} <i>more</i> than the Cutline — because the '
+            f'payments stop immediately while the cost of a lost dealer arrives slowly. '
+            f'{verdict} The measurement window is doing the arguing, exactly as it does with '
+            f'the elasticities.</div>',
+            unsafe_allow_html=True)
+    else:
+        st.markdown(
+            f'<div class="bp-card" style="border-left:3px solid {ui.C["amber"]}">'
+            f'At {P["months"]} months, cutting past the Breakpoint still shows '
+            f'{ui.money(gain_now, digits=0)} more than the Cutline on cash alone — but the '
+            f'model prices no terminal value for an intact channel, so this is the most '
+            f'favourable case deep cutting can be given.</div>',
+            unsafe_allow_html=True)
+
 # ---- four-question strip ----
 q1, q2, q3, q4 = st.columns(4)
 with q1:
